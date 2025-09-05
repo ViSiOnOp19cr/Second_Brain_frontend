@@ -3,7 +3,6 @@ import { Video } from "../assets/video";
 import { Article } from "../assets/Article";
 import { Document } from "../assets/document";
 import { ShareIcon } from "../assets/Shareicon";
-import { useState } from "react";
 
 interface ContentCardProps {
     title: string;
@@ -14,7 +13,6 @@ interface ContentCardProps {
 }
 
 export const ContentCard = ({ title, type, link, tags, createdAt }: ContentCardProps) => {
-    const [isHovered, setIsHovered] = useState(false);
     
     const getIcon = () => {
         switch(type.toLowerCase()) {
@@ -45,11 +43,7 @@ export const ContentCard = ({ title, type, link, tags, createdAt }: ContentCardP
             return `${diffInDays} days ago`;
         }
     };
-    const handleCardClick = () => {
-        if (link) {
-            window.open(link, '_blank', 'noopener,noreferrer');
-        }
-    };
+    
 
     const handleShare = async () => {
         try {
@@ -60,15 +54,13 @@ export const ContentCard = ({ title, type, link, tags, createdAt }: ContentCardP
         } catch (err) {
             navigator.clipboard.writeText(link);
             alert('Link copied to clipboard!');
+            console.error('Error sharing:', err);
         }
     };
 
     return (
         <div 
-            className="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition-all duration-200 cursor-pointer relative group"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={handleCardClick}
+            
         >
 
             <button

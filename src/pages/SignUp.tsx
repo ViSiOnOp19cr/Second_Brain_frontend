@@ -30,6 +30,7 @@ export const SignUp = () => {
             navigate('/signin');
         } catch (error) {
             alert("signup failed try again");
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
