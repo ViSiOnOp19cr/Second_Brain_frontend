@@ -86,6 +86,12 @@ export const Dashborad = () => {
     fetchContent();
   };
 
+  const handleContentDeleted = (id: number) => {
+    // Update the content list by filtering out the deleted item
+    const updatedContent = content.filter(item => item.id !== id);
+    setContent(updatedContent);
+  };
+
   if (error) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -209,7 +215,7 @@ export const Dashborad = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
               {filteredContent.map((item) => {
                 let tagsForCard: { title: string }[] = [];
                 if (
@@ -248,11 +254,13 @@ export const Dashborad = () => {
                 return (
                   <ContentCard
                     key={item.id}
+                    id={item.id}
                     title={item.title}
                     type={item.type}
                     link={item.link}
                     tags={tagsForCard}
                     createdAt={item.createdAt || new Date().toISOString()}
+                    onDelete={handleContentDeleted}
                   />
                 );
               })}

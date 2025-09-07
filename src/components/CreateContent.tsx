@@ -1,6 +1,8 @@
 import { useState } from "react"
-import axios from "axios"
 import { BACKEND_URL } from "../config"
+import { useErrorHandler, handleApiError } from "../hooks/useErrorHandler"
+import api from "../utils/axios"
+import { isNotEmpty, isValidUrl } from "../utils/validation"
 
 interface CreateContentProps {
     onSuccess: () => void;
@@ -16,6 +18,12 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
     const [loading, setLoading] = useState(false);
     const token = localStorage.getItem('token');
     const options = ["Youtube", "Twitter", "Article", "Document"];
+    const { addError } = useErrorHandler();
+    const [formErrors, setFormErrors] = useState({
+        title: "",
+        link: "",
+        type: ""
+    });
 
     if (!token) {
         return <div className="text-red-500">Please login to create content</div>;
@@ -25,25 +33,52 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
         setContent({ ...content, [e.target.name]: e.target.value })
     }
 
+    const validateForm = () => {
+        let isValid = true;
+        const errors = {
+            title: "",
+            link: "",
+            type: ""
+        };
+
+        if (!isNotEmpty(content.title)) {
+            errors.title = "Title is required";
+            isValid = false;
+        }
+
+        if (!isNotEmpty(content.link)) {
+            errors.link = "Link is required";
+            isValid = false;
+        } else if (!isValidUrl(content.link)) {
+            errors.link = "Please enter a valid URL starting with http:// or https://";
+            isValid = false;
+        }
+
+        if (!isNotEmpty(content.type)) {
+            errors.type = "Please select a content type";
+            isValid = false;
+        }
+
+        setFormErrors(errors);
+        return isValid;
+    };
+
     const handleSubmit = async () => {
+        if (!validateForm()) {
+            return;
+        }
+        
+        setLoading(true);
+        
         try {
-            if (!content.title || !content.link || !content.type) {
-                alert("Title, link and type are required");
-                return;
-            }
-            setLoading(true);
-            
             const tagsArray = content.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
             
-            await axios.post(BACKEND_URL + '/content', {
+            await api.post('/content', {
                 ...content,
                 tags: tagsArray
-            }, {
-                headers: {
-                    Authorization: token
-                }
             });
             
+            addError("Content created successfully!", "success");
             onSuccess();
             setContent({
                 title: "",
@@ -52,8 +87,7 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
                 tags: ""
             });
         } catch (e) {
-            console.error(e);
-            alert("Failed to create content");
+            handleApiError(e, addError);
         } finally {
             setLoading(false);
         }
@@ -71,9 +105,12 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
                     name="title"
                     value={content.title}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 bg-gray-700 border ${formErrors.title ? 'border-red-500' : 'border-gray-600'} rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                     placeholder="Enter content title"
                 />
+                {formErrors.title && (
+                    <p className="mt-1 text-sm text-red-500">{formErrors.title}</p>
+                )}
             </div>
 
             <div>
@@ -86,9 +123,12 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
                     name="link"
                     value={content.link}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 bg-gray-700 border ${formErrors.link ? 'border-red-500' : 'border-gray-600'} rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                     placeholder="https://..."
                 />
+                {formErrors.link && (
+                    <p className="mt-1 text-sm text-red-500">{formErrors.link}</p>
+                )}
             </div>
 
             <div>
@@ -100,7 +140,7 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
                     name="type"
                     value={content.type}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 bg-gray-700 border ${formErrors.type ? 'border-red-500' : 'border-gray-600'} rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                 >
                     <option value="">Select type</option>
                     {options.map((opt: string) => (
@@ -109,6 +149,9 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
                         </option>
                     ))}
                 </select>
+                {formErrors.type && (
+                    <p className="mt-1 text-sm text-red-500">{formErrors.type}</p>
+                )}
             </div>
 
             <div>

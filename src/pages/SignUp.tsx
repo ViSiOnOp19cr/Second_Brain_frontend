@@ -2,6 +2,8 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+import { useErrorHandler, handleApiError } from "../hooks/useErrorHandler";
+import { isValidEmail, isValidPassword } from "../utils/validation";
 
 export const SignUp = () => {
     const [form, setForm] = useState({
@@ -10,27 +12,61 @@ export const SignUp = () => {
     })
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { addError } = useErrorHandler();
+    const [formErrors, setFormErrors] = useState({
+        username: "",
+        password: ""
+    });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value })
     }
 
+    const validateForm = () => {
+        let isValid = true;
+        const errors = {
+            username: "",
+            password: ""
+        };
+
+        // Email validation
+        if (!form.username) {
+            errors.username = "Email is required";
+            isValid = false;
+        } else if (!isValidEmail(form.username)) {
+            errors.username = "Please enter a valid email address";
+            isValid = false;
+        }
+
+        // Password validation
+        if (!form.password) {
+            errors.password = "Password is required";
+            isValid = false;
+        } else if (!isValidPassword(form.password)) {
+            errors.password = "Password must be at least 8 characters long";
+            isValid = false;
+        }
+
+        setFormErrors(errors);
+        return isValid;
+    };
+
     const handleSubmit = async () => {
-        if (!form.username || !form.password) {
-            alert("Both fields are required");
+        if (!validateForm()) {
             return;
         }
         
         setIsLoading(true);
         try {
-            await axios.post(BACKEND_URL + '/signup', {
+            const response = await axios.post(BACKEND_URL + '/signup', {
                 username: form.username,
                 password: form.password
-            })
+            });
+            
+            addError("Account created successfully! Please sign in.", "success");
             navigate('/signin');
-        } catch (error) {
-            alert("signup failed try again");
-            console.error(error);
+        } catch (error: any) {
+            handleApiError(error, addError);
         } finally {
             setIsLoading(false);
         }
@@ -61,9 +97,12 @@ export const SignUp = () => {
                                 name="username"
                                 value={form.username}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-600 rounded-md bg-gray-700 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                                className={`w-full px-4 py-3 border ${formErrors.username ? 'border-red-500' : 'border-gray-600'} rounded-md bg-gray-700 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors`}
                                 disabled={isLoading}
                             />
+                            {formErrors.username && (
+                                <p className="mt-1 text-sm text-red-500">{formErrors.username}</p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -73,13 +112,16 @@ export const SignUp = () => {
                             <input
                                 id="password"
                                 type="password"
-                                placeholder="Enter your password"
+                                placeholder="Enter your password (min. 8 characters)"
                                 name="password"
                                 value={form.password}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-600 rounded-md bg-gray-700 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                                className={`w-full px-4 py-3 border ${formErrors.password ? 'border-red-500' : 'border-gray-600'} rounded-md bg-gray-700 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors`}
                                 disabled={isLoading}
                             />
+                            {formErrors.password && (
+                                <p className="mt-1 text-sm text-red-500">{formErrors.password}</p>
+                            )}
                         </div>
                         <button
                             onClick={handleSubmit}
