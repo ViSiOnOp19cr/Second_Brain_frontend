@@ -15,6 +15,7 @@ export const Dashborad = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentFilter, setCurrentFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -106,26 +107,48 @@ export const Dashborad = () => {
     );
   }
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
   return (
     <div className="flex h-screen bg-gray-900">
       <Sidebar
         onAddNew={() => setShowCreateModal(true)}
         onFilterChange={handleFilterChange}
         currentFilter={typeFilter !== "all" ? typeFilter : currentFilter}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
-      <div className="flex-1 ml-64 overflow-y-auto">
-        <div className="p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">
-              Your Second Brain
-            </h1>
-            <p className="text-gray-400">
-              Store and organize your important links in one place
-            </p>
+      {/* Mobile menu overlay */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 sm:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        ></div>
+      )}
+
+      <div className="flex-1 sm:ml-64 overflow-y-auto">
+        <div className="p-4 sm:p-6 md:p-8">
+          <div className="mb-8 flex items-center justify-between">
+            <button 
+              className="sm:hidden mr-4 text-gray-400 hover:text-white"
+              onClick={toggleMobileSidebar}
+            >
+              ☰
+            </button>
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                Your Second Brain
+              </h1>
+              <p className="text-gray-400 text-sm sm:text-base">
+                Store and organize your important links in one place
+              </p>
+            </div>
           </div>
           <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
               <input
                 type="text"
                 placeholder="Search links..."
@@ -142,60 +165,62 @@ export const Dashborad = () => {
               </button>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setTypeFilter("all");
-                  setCurrentFilter("all");
-                }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  typeFilter === "all" && currentFilter === "all"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:text-white"
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => handleFilterChange("youtube")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  typeFilter === "youtube"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:text-white"
-                }`}
-              >
-                YouTube
-              </button>
-              <button
-                onClick={() => handleFilterChange("twitter")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  typeFilter === "twitter"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:text-white"
-                }`}
-              >
-                Twitter/X
-              </button>
-              <button
-                onClick={() => handleFilterChange("article")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  typeFilter === "article"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:text-white"
-                }`}
-              >
-                Articles
-              </button>
-              <button
-                onClick={() => handleFilterChange("document")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  typeFilter === "document"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:text-white"
-                }`}
-              >
-                Document
-              </button>
+            <div className="overflow-x-auto pb-2">
+              <div className="flex gap-2 min-w-max">
+                <button
+                  onClick={() => {
+                    setTypeFilter("all");
+                    setCurrentFilter("all");
+                  }}
+                  className={`px-3 py-2 text-sm sm:px-4 sm:text-base rounded-lg font-medium transition-colors ${
+                    typeFilter === "all" && currentFilter === "all"
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => handleFilterChange("youtube")}
+                  className={`px-3 py-2 text-sm sm:px-4 sm:text-base rounded-lg font-medium transition-colors ${
+                    typeFilter === "youtube"
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  YouTube
+                </button>
+                <button
+                  onClick={() => handleFilterChange("twitter")}
+                  className={`px-3 py-2 text-sm sm:px-4 sm:text-base rounded-lg font-medium transition-colors ${
+                    typeFilter === "twitter"
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Twitter/X
+                </button>
+                <button
+                  onClick={() => handleFilterChange("article")}
+                  className={`px-3 py-2 text-sm sm:px-4 sm:text-base rounded-lg font-medium transition-colors ${
+                    typeFilter === "article"
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Articles
+                </button>
+                <button
+                  onClick={() => handleFilterChange("document")}
+                  className={`px-3 py-2 text-sm sm:px-4 sm:text-base rounded-lg font-medium transition-colors ${
+                    typeFilter === "document"
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Document
+                </button>
+              </div>
             </div>
           </div>
 
@@ -221,7 +246,7 @@ export const Dashborad = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 pb-8">
               {filteredContent.map((item) => {
                 let tagsForCard: { title: string }[] = [];
                 if (

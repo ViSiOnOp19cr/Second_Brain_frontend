@@ -117,7 +117,7 @@ export const ContentCard = ({ id, title, type, link, tags, createdAt, onDelete }
             {/* Gradient accent bar at the top */}
             <div className={`h-1.5 w-full bg-gradient-to-r ${getTypeColor()}`}></div>
             
-            <div className="p-5">
+            <div className="p-4 sm:p-5">
                 {/* Content type and time */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-gray-400 text-sm">
@@ -130,7 +130,7 @@ export const ContentCard = ({ id, title, type, link, tags, createdAt, onDelete }
                 </div>
 
                 {/* Title */}
-                <h3 className="text-white font-medium text-lg mb-4 line-clamp-2 hover:text-purple-400 transition-colors">
+                <h3 className="text-white font-medium text-base sm:text-lg mb-3 sm:mb-4 line-clamp-2 hover:text-purple-400 transition-colors">
                     {title}
                 </h3>
 

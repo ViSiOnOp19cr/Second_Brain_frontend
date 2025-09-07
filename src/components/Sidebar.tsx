@@ -12,9 +12,11 @@ interface SidebarProps {
     onAddNew: () => void;
     onFilterChange: (filter: string) => void;
     currentFilter: string;
+    isMobileOpen?: boolean;
+    onCloseMobile?: () => void;
 }
 
-export function Sidebar({ onAddNew, onFilterChange, currentFilter }: SidebarProps) {
+export function Sidebar({ onAddNew, onFilterChange, currentFilter, isMobileOpen, onCloseMobile }: SidebarProps) {
     const navigate = useNavigate();
     
     const handleSignOut = () => {
@@ -23,20 +25,31 @@ export function Sidebar({ onAddNew, onFilterChange, currentFilter }: SidebarProp
     };
 
     return (
-        <div className="h-screen bg-gray-800 border-r border-gray-700 w-64 fixed left-0 top-0 flex flex-col">
+        <div className={`h-screen bg-gray-800 border-r border-gray-700 fixed top-0 flex flex-col z-30 transition-all duration-300 ease-in-out ${isMobileOpen ? 'left-0 w-full sm:w-64' : '-left-full sm:left-0 sm:w-64'}`}>
             <div className="p-6">
-                <div className="flex items-center gap-3 text-xl font-semibold text-white mb-8">
-                    <div className="text-purple-500">
-                        <Brainicon/>
+                <div className="flex items-center justify-between text-xl font-semibold text-white mb-8">
+                    <div className="flex items-center gap-3">
+                        <div className="text-purple-500">
+                            <Brainicon/>
+                        </div>
+                        SecondBrain
                     </div>
-                    SecondBrain
+                    <button 
+                        onClick={onCloseMobile} 
+                        className="text-gray-400 hover:text-white sm:hidden"
+                    >
+                        ✕
+                    </button>
                 </div>
                 
                 <div className="space-y-2">
                     <Sidebaritem 
                         text="All Links" 
                         icon={<Home/>} 
-                        onClick={() => onFilterChange('all')}
+                        onClick={() => {
+                            onFilterChange('all');
+                            if (onCloseMobile) onCloseMobile();
+                        }}
                         isActive={currentFilter === 'all'}
                     />
                 </div>
@@ -46,31 +59,46 @@ export function Sidebar({ onAddNew, onFilterChange, currentFilter }: SidebarProp
                     <Sidebaritem 
                         text="YouTube" 
                         icon={<Video/>} 
-                        onClick={() => onFilterChange('youtube')}
+                        onClick={() => {
+                            onFilterChange('youtube');
+                            if (onCloseMobile) onCloseMobile();
+                        }}
                         isActive={currentFilter === 'youtube'}
                     />
                     <Sidebaritem 
                         text="Twitter/X" 
                         icon={<Twitter/>} 
-                        onClick={() => onFilterChange('twitter')}
+                        onClick={() => {
+                            onFilterChange('twitter');
+                            if (onCloseMobile) onCloseMobile();
+                        }}
                         isActive={currentFilter === 'twitter'}
                     />
                     <Sidebaritem 
                         text="Articles" 
                         icon={<Article/>} 
-                        onClick={() => onFilterChange('article')}
+                        onClick={() => {
+                            onFilterChange('article');
+                            if (onCloseMobile) onCloseMobile();
+                        }}
                         isActive={currentFilter === 'article'}
                     />
                     <Sidebaritem 
                         text="Document"
                         icon={<Document/>}
-                        onClick={() => onFilterChange('document')}
+                        onClick={() => {
+                            onFilterChange('document');
+                            if (onCloseMobile) onCloseMobile();
+                        }}
                         isActive={currentFilter === 'document'}
                     />
                 </div>
 
                 <button
-                    onClick={onAddNew}
+                    onClick={() => {
+                        onAddNew();
+                        if (onCloseMobile) onCloseMobile();
+                    }}
                     className="mt-8 w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
                 >
                     <Plusicon />
