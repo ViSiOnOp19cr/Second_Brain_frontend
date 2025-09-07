@@ -6,6 +6,16 @@ import { isNotEmpty, isValidUrl } from "../utils/validation"
 interface CreateContentProps {
     onSuccess: () => void;
 }
+interface ApiError {
+    response?: {
+      data?: {
+        message?: string;
+      } & Record<string, unknown>;
+      status?: number;
+    };
+    request?: unknown;
+    message?: string;
+  }
 
 export const CreateContent = ({ onSuccess }: CreateContentProps) => {
     const [content, setContent] = useState({
@@ -86,7 +96,7 @@ export const CreateContent = ({ onSuccess }: CreateContentProps) => {
                 tags: ""
             });
         } catch (e) {
-            handleApiError(e, addError);
+            handleApiError(e as ApiError, addError);
         } finally {
             setLoading(false);
         }

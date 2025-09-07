@@ -4,6 +4,18 @@ import { useErrorHandler, handleApiError } from "../hooks/useErrorHandler";
 import api from "../utils/axios";
 import { isValidEmail } from "../utils/validation";
 
+interface ApiError {
+    response?: {
+      data?: {
+        message?: string;
+      } & Record<string, unknown>;
+      status?: number;
+    };
+    request?: unknown;
+    message?: string;
+  }
+
+
 export const SignIn = () => {
     const [form, setForm] = useState({
         username: "",
@@ -72,7 +84,7 @@ export const SignIn = () => {
             navigate('/');
         } catch (error: unknown) {
             // Use the error handler utility
-            handleApiError(error, addError);
+            handleApiError(error as ApiError, addError);
         } finally {
             setIsLoading(false);
         }

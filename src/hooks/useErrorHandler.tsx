@@ -80,7 +80,6 @@ export function useErrorHandler() {
 }
 
 
-// Define a type for API errors
 interface ApiError {
   response?: {
     data?: {
@@ -92,7 +91,7 @@ interface ApiError {
   message?: string;
 }
 
-export function handleApiError(error: ApiError | Error, addError: (message: string, severity: ErrorSeverity) => void) {
+export function handleApiError(error: ApiError, addError: (message: string, severity: ErrorSeverity) => void) {
   let errorMessage = 'An unknown error occurred';
   
   if ('response' in error && error.response) {

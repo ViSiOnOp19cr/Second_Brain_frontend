@@ -5,6 +5,17 @@ import { BACKEND_URL } from "../config";
 import { useErrorHandler, handleApiError } from "../hooks/useErrorHandler";
 import { isValidEmail, isValidPassword } from "../utils/validation";
 
+interface ApiError {
+    response?: {
+      data?: {
+        message?: string;
+      } & Record<string, unknown>;
+      status?: number;
+    };
+    request?: unknown;
+    message?: string;
+  }
+
 export const SignUp = () => {
     const [form, setForm] = useState({
         username: "",
@@ -66,7 +77,7 @@ export const SignUp = () => {
             addError("Account created successfully! Please sign in.", "success");
             navigate('/signin');
         } catch (error: unknown) {
-            handleApiError(error, addError);
+            handleApiError(error as ApiError, addError);
         } finally {
             setIsLoading(false);
         }

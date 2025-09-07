@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 export const Dashborad = () => {
   const navigate = useNavigate();
   const { content, loading, fetchContent, error } = useContent();
+  const [localContent, setLocalContent] = useState<typeof content>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentFilter, setCurrentFilter] = useState("all");
@@ -21,8 +22,13 @@ export const Dashborad = () => {
       navigate("/signin");
     }
   }, [navigate]);
+  
+  // Update localContent when content changes
+  useEffect(() => {
+    setLocalContent(content);
+  }, [content]);
 
-  const filteredContent = content.filter((item) => {
+  const filteredContent = localContent.filter((item) => {
     let tags: string[] = [];
     if (item.tags && Array.isArray(item.tags)) {
       if (item.tags.length > 0) {
@@ -87,9 +93,9 @@ export const Dashborad = () => {
   };
 
   const handleContentDeleted = (id: number) => {
-    // Update the content list by filtering out the deleted item
-    const updatedContent = content.filter(item => item.id !== id);
-    setContent(updatedContent);
+    // Update the local content list by filtering out the deleted item
+    const updatedContent = localContent.filter(item => item.id !== id);
+    setLocalContent(updatedContent);
   };
 
   if (error) {
