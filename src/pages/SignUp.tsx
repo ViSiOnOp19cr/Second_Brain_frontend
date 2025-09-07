@@ -58,14 +58,14 @@ export const SignUp = () => {
         
         setIsLoading(true);
         try {
-            const response = await axios.post(BACKEND_URL + '/signup', {
+            await axios.post(BACKEND_URL + '/signup', {
                 username: form.username,
                 password: form.password
             });
             
             addError("Account created successfully! Please sign in.", "success");
             navigate('/signin');
-        } catch (error: any) {
+        } catch (error: unknown) {
             handleApiError(error, addError);
         } finally {
             setIsLoading(false);

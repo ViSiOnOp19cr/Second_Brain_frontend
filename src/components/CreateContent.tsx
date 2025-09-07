@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { BACKEND_URL } from "../config"
 import { useErrorHandler, handleApiError } from "../hooks/useErrorHandler"
 import api from "../utils/axios"
 import { isNotEmpty, isValidUrl } from "../utils/validation"

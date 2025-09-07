@@ -71,8 +71,6 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
     </ErrorContext.Provider>
   );
 }
-
-// Custom hook for using the error context
 export function useErrorHandler() {
   const context = useContext(ErrorContext);
   if (!context) {
@@ -81,35 +79,42 @@ export function useErrorHandler() {
   return context;
 }
 
-// API error handler utility
-export function handleApiError(error: any, addError: (message: string, severity: ErrorSeverity) => void) {
-  // Extract error message from different possible formats
+
+// Define a type for API errors
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    } & Record<string, unknown>;
+    status?: number;
+  };
+  request?: unknown;
+  message?: string;
+}
+
+export function handleApiError(error: ApiError | Error, addError: (message: string, severity: ErrorSeverity) => void) {
   let errorMessage = 'An unknown error occurred';
   
-  if (error.response) {
-    // The request was made and the server responded with an error status
-    const data = error.response.data;
+  if ('response' in error && error.response) {
+    const data = error.response?.data;
     
-    if (data.message) {
+    if (data?.message) {
       errorMessage = data.message;
     } else if (typeof data === 'string') {
       errorMessage = data;
     } else {
-      errorMessage = `Request failed with status ${error.response.status}`;
+      errorMessage = `Request failed with status ${error.response?.status}`;
     }
-  } else if (error.request) {
-    // The request was made but no response was received
+  } else if ('request' in error && error.request) {
     errorMessage = 'No response received from server';
-  } else if (error.message) {
-    // Something happened in setting up the request
+  } else if (error instanceof Error) {
     errorMessage = error.message;
   }
 
-  // Log the full error for debugging
   console.error('API Error:', error);
   
-  // Add to error context
   addError(errorMessage, 'error');
   
   return errorMessage;
 }
+

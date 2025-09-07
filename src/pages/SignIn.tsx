@@ -70,7 +70,7 @@ export const SignIn = () => {
             localStorage.setItem('token', response.data.token);
             addError("Successfully signed in", "success");
             navigate('/');
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Use the error handler utility
             handleApiError(error, addError);
         } finally {
