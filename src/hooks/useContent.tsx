@@ -7,6 +7,16 @@ interface Tag {
     id: number;
     title: string;
 }
+interface ApiError {
+    response?: {
+      data?: {
+        message?: string;
+      } & Record<string, unknown>;
+      status?: number;
+    };
+    request?: unknown;
+    message?: string;
+  }
 
 interface ContentItem {
     id: number;
@@ -33,7 +43,6 @@ export const useContent = () => {
         try {
             setLoading(true);
             const response = await api.get('/content');
-            
             if (response.data.data && Array.isArray(response.data.data)) {
                 setContent(response.data.data);
             } else if (response.data.formatted && Array.isArray(response.data.formatted)) {
@@ -43,7 +52,7 @@ export const useContent = () => {
                 throw new Error('Invalid response format');
             }
         } catch (e) {
-            handleApiError(e, addError);
+            handleApiError(e as ApiError, addError);
             setError('Failed to fetch content');
         } finally {
             setLoading(false);
